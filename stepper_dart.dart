@@ -24,7 +24,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _currentStep = 0;
-  final myController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,26 +66,55 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Step> _mySteps(){
     List<Step> _steps = [
       Step(
-        title: Text('Step 1',style: TextStyle(fontWeight:FontWeight.bold ),),
-        content: Image.asset(
-    'asset/1.jpg',fit: BoxFit.cover,
+        title: Text('Step 1: Build a tank:',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
+        content: Column(
+          children: <Widget>[
+            Text('Depending on the number of users and volume of water to be collected, decide the type of your tank (RCC, Cement, Plastic).'),
+            Image.asset(
+    'assets/images/image.png',fit: BoxFit.cover,
+            ),
+          ],
         ),
-
-        subtitle: Text('', style: TextStyle(fontWeight:FontWeight.bold ),),
         isActive: _currentStep >= 0,
       ),
 
       Step(
-        title: Text('Step 2'),
+        title: Text('Step 2: Connecting pipes:',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
 
-        content:TextField(),
+        content:Column(
+          children: <Widget>[
+            Text('Depending on the size of the building decide the number of outlets from the roof to the ground level.'),
+            Image.asset(
+    'assets/images/image.png',fit: BoxFit.cover,
+            ),
+          ],
+        ),
         isActive: _currentStep >= 1,
       ),
       Step(
-        title: Text('Step 3'),
-        content: TextField(),
+        title: Text('Step 3: Filtration:',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
+        content: Column(
+          children: <Widget>[
+            Text('Connect the RWH filter at the end of the pipe.'),
+            Image.asset(
+    'assets/images/image.png',fit: BoxFit.cover,
+            ),
+          ],
+        ),
         isActive: _currentStep >= 2,
-      )
+      ),
+      Step(
+        title: Text('Step 4: Storage: ',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
+        content: Column(
+          children: <Widget>[
+            Text('Connect the other end of the filter to a pipe leading to the storage element/tank.'),
+            Image.asset(
+    'assets/images/image.png',fit: BoxFit.cover,
+            ),
+          ],
+        ),
+        isActive: _currentStep >= 3,
+      ),
     ];
     return _steps;
   }
