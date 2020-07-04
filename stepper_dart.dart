@@ -69,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Step 1: Build a tank:',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
         content: Column(
           children: <Widget>[
-            Text('Depending on the number of users and volume of water to be collected, decide the type of your tank (RCC, Cement, Plastic).'),
+            Text('Depending on the number of users and volume of water to be collected, decide the type of your tank (RCC, Cement, Plastic).\n'),
             Image.asset(
     'assets/images/image.png',fit: BoxFit.cover,
             ),
@@ -83,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
         content:Column(
           children: <Widget>[
-            Text('Depending on the size of the building decide the number of outlets from the roof to the ground level.'),
+            Text('Depending on the size of the building decide the number of outlets from the roof to the ground level.\n'),
             Image.asset(
     'assets/images/image.png',fit: BoxFit.cover,
             ),
@@ -95,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Step 3: Filtration:',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
         content: Column(
           children: <Widget>[
-            Text('Connect the RWH filter at the end of the pipe.'),
+            Text('Connect the RWH filter at the end of the pipe.\n'),
             Image.asset(
     'assets/images/image.png',fit: BoxFit.cover,
             ),
@@ -107,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text('Step 4: Storage: ',style: TextStyle(fontWeight:FontWeight.bold, fontSize: 15),),
         content: Column(
           children: <Widget>[
-            Text('Connect the other end of the filter to a pipe leading to the storage element/tank.'),
+            Text('Connect the other end of the filter to a pipe leading to the storage element/tank.\n'),
             Image.asset(
     'assets/images/image.png',fit: BoxFit.cover,
             ),
