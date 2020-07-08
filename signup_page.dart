@@ -49,7 +49,7 @@ class _SignUpPageState extends State<SignUpPage> {
               physics: AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.symmetric(
                 horizontal: 40,
-                vertical: 130,
+                vertical: 80,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -68,23 +68,38 @@ class _SignUpPageState extends State<SignUpPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        height: 200,
+                        height: 380,
                         child: Form(
                           key: _formKey,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                              Text("Email:", style: kLabelStyle),
+                              Text("Username:", style: kLabelStyle),
                               TextFormField(
                                 validator: (input) {
                                   if (input.isEmpty) {
-                                    return 'Please type an email';
+                                    return 'Username can not be blank';
                                   }
                                 },
                                 onSaved: (input) => _email = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(top: 15),
+                                  contentPadding: EdgeInsets.only(top: 13),
+                                  prefixIcon: Icon(Icons.account_circle,
+                                      color: Colors.white),
+                                  hintText: 'Enter your name',
+                                  hintStyle: kHintTextStyle,
+                                ),
+                              ),
+                              Text(""),
+                              Text(""),
+                              Text("Email:", style: kLabelStyle),
+                              TextFormField(
+                                validator: validateEmail,
+                                onSaved: (input) => _email = input,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(top: 13),
                                   prefixIcon:
                                       Icon(Icons.email, color: Colors.white),
                                   hintText: 'Enter your Email',
@@ -103,7 +118,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 onSaved: (input) => _password = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(top: 15),
+                                  contentPadding: EdgeInsets.only(top: 13),
                                   prefixIcon:
                                       Icon(Icons.lock, color: Colors.white),
                                   hintText: 'Enter Password',
@@ -147,14 +162,30 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  String validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return 'Enter Valid Email';
+    else
+      return null;
+  }
+
   Future<void> signUp() async {
     final formState = _formKey.currentState;
     if (formState.validate()) {
       formState.save();
+
+      FirebaseUser user = (await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(
+                  email: _email, password: _password))
+          .user;
+      //user.sendEmailVerification(); // display for user that we sent an email
       try {
-        await FirebaseAuth.instance
-            .createUserWithEmailAndPassword(email: _email, password: _password);
-        //user.sendEmailVerification(); // display for user that we sent an email
+        await user.sendEmailVerification();
+        
+        return user.uid;
         Navigator.push(
             context,
             MaterialPageRoute(
