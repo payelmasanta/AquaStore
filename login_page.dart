@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import './forgot_pass.dart';
 //import 'package:firebase_core/firebase_core.dart';
 import './signup_page.dart';
 import 'dart:async';
@@ -25,8 +26,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  String _email, _password;
-
+  String email, password;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -80,8 +80,9 @@ class _LoginPageState extends State<LoginPage> {
                             children: <Widget>[
                               Text("Email:", style: kLabelStyle),
                               TextFormField(
+                                keyboardType: TextInputType.emailAddress,
                                 validator: validateEmail,
-                                onSaved: (input) => _email = input,
+                                onSaved: (input) => email = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(top: 15),
@@ -96,12 +97,12 @@ class _LoginPageState extends State<LoginPage> {
                               Text("Password:", style: kLabelStyle),
                               TextFormField(
                                 obscureText: true,
+                                onSaved: (input) => password = input,
                                 validator: (input) {
-                                  if (input.length < 6) {
-                                    return 'Please type an password with atleast 6 characters';
+                                  if ((input) != SignUpPageState.password) {
+                                    return 'Please enter a valid password';
                                   }
                                 },
-                                onSaved: (input) => _password = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(top: 15),
@@ -109,6 +110,21 @@ class _LoginPageState extends State<LoginPage> {
                                       Icon(Icons.lock, color: Colors.white),
                                   hintText: 'Enter Password',
                                   hintStyle: kHintTextStyle,
+                                ),
+                              ),
+                              FlatButton(
+                                onPressed: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ForgotPass(),
+                                    )),
+                                padding: EdgeInsets.only(right: 0),
+                                child: Text(
+                                  'Forgot Password?',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800),
                                 ),
                               ),
                             ],
@@ -197,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
       formState.save();
       try {
         FirebaseUser user = (await FirebaseAuth.instance
-                .signInWithEmailAndPassword(email: _email, password: _password))
+                .signInWithEmailAndPassword(email: email, password: password))
             .user;
         if (user.isEmailVerified) {
           Navigator.push(
@@ -208,6 +224,7 @@ class _LoginPageState extends State<LoginPage> {
 
           return user.uid;
         } else {
+          // popup message
           return null;
         }
       } catch (e) {
