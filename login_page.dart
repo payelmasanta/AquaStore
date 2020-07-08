@@ -71,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        height: 200,
+                        height: 300,
                         child: Form(
                           key: _formKey,
                           child: Column(
@@ -79,11 +79,7 @@ class _LoginPageState extends State<LoginPage> {
                             children: <Widget>[
                               Text("Email:", style: kLabelStyle),
                               TextFormField(
-                                validator: (input) {
-                                  if (input.isEmpty) {
-                                    return 'Please type an email';
-                                  }
-                                },
+                                validator: validateEmail,
                                 onSaved: (input) => _email = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
@@ -183,19 +179,36 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  String validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value))
+      return 'Enter Valid Email';
+    else
+      return null;
+  }
+
   Future<void> signIn() async {
     final formState = _formKey.currentState;
     if (formState.validate()) {
       formState.save();
       try {
-        await FirebaseAuth.instance
-            .signInWithEmailAndPassword(email: _email, password: _password);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MyHomePagee(),
-            ));
-        // navigate to home
+        FirebaseUser user = (await FirebaseAuth.instance
+                .signInWithEmailAndPassword(email: _email, password: _password))
+            .user;
+        if (user.isEmailVerified) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePagee(),
+              ));
+
+          return user.uid;
+        } else {
+          Text('Please Verify your Email');
+          return null;
+        }
       } catch (e) {
         print(e.message);
       }
