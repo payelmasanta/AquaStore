@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+//import 'package:fluttertoast/fluttertoast.dart';
 import './login_page.dart';
 
 final kHintTextStyle = TextStyle(
@@ -22,7 +24,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  String _email, _password;
+  String _username, _email, _password, _confirmpass;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -81,7 +83,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                     return 'Username can not be blank';
                                   }
                                 },
-                                onSaved: (input) => _email = input,
+                                onSaved: (input) => _username = input,
                                 decoration: InputDecoration(
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.only(top: 13),
@@ -91,7 +93,6 @@ class _SignUpPageState extends State<SignUpPage> {
                                   hintStyle: kHintTextStyle,
                                 ),
                               ),
-                              Text(""),
                               Text(""),
                               Text("Email:", style: kLabelStyle),
                               TextFormField(
@@ -107,9 +108,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ),
                               ),
                               Text(""),
-                              Text(""),
                               Text("Password:", style: kLabelStyle),
                               TextFormField(
+                                obscureText: true,
                                 validator: (input) {
                                   if (input.length < 6) {
                                     return 'Please type an password with atleast 6 characters';
@@ -122,6 +123,25 @@ class _SignUpPageState extends State<SignUpPage> {
                                   prefixIcon:
                                       Icon(Icons.lock, color: Colors.white),
                                   hintText: 'Enter Password',
+                                  hintStyle: kHintTextStyle,
+                                ),
+                              ),
+                              Text(""),
+                              Text("Confirm Password:", style: kLabelStyle),
+                              TextFormField(
+                                obscureText: true,
+                                onSaved: (input) => _confirmpass = input,
+                                validator: (input) {
+                                  if (_confirmpass != _password) {
+                                    return 'Password do not match';
+                                  }
+                                },
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(top: 13),
+                                  prefixIcon:
+                                      Icon(Icons.lock, color: Colors.white),
+                                  hintText: 'Confirm Password',
                                   hintStyle: kHintTextStyle,
                                 ),
                               ),
@@ -162,6 +182,42 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 
+  FlutterToast flutterToast;
+
+  @override
+  void initState() {
+    super.initState();
+    flutterToast = FlutterToast(context);
+  }
+
+  _showToast() {
+    Widget toast = Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Colors.black87,
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 12.0,
+          ),
+          Text(
+            "Verification email has been sent.Please check.",
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+    );
+
+    flutterToast.showToast(
+      child: toast,
+      gravity: ToastGravity.BOTTOM,
+      toastDuration: Duration(seconds: 4),
+    );
+  }
+
   String validateEmail(String value) {
     Pattern pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
@@ -177,20 +233,23 @@ class _SignUpPageState extends State<SignUpPage> {
     if (formState.validate()) {
       formState.save();
 
-      FirebaseUser user = (await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
-                  email: _email, password: _password))
-          .user;
+      FirebaseUser user =
+          (await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _email,
+        password: _password,
+      ))
+              .user;
       //user.sendEmailVerification(); // display for user that we sent an email
       try {
         await user.sendEmailVerification();
-        
-        return user.uid;
+        _showToast();
         Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => LoginPage(),
             ));
+
+        return user.uid;
       } catch (e) {
         print(e.message);
       }
