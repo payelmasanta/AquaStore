@@ -26,6 +26,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   String _email, _password;
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
@@ -94,6 +95,7 @@ class _LoginPageState extends State<LoginPage> {
                               Text(""),
                               Text("Password:", style: kLabelStyle),
                               TextFormField(
+                                obscureText: true,
                                 validator: (input) {
                                   if (input.length < 6) {
                                     return 'Please type an password with atleast 6 characters';
@@ -206,7 +208,6 @@ class _LoginPageState extends State<LoginPage> {
 
           return user.uid;
         } else {
-          Text('Please Verify your Email');
           return null;
         }
       } catch (e) {
