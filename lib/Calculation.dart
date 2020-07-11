@@ -105,7 +105,7 @@ class _CalculationsState extends State<Calculations> {
                       validator: (input) {
                         //_formKey.currentState.save();
                         if (input.isEmpty) {
-                          return 'Username can not be blank';
+                          return 'Roofsize can not be blank';
                         }
                       },
                       onSaved: (input) {
@@ -134,11 +134,10 @@ class _CalculationsState extends State<Calculations> {
     );
   }
 
-  String submitit(String n) {
+  void submitit(String n) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       print(n);
-      return n;
     }
   }
 }
