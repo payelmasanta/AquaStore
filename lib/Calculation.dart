@@ -12,7 +12,8 @@ class Calculations extends StatefulWidget {
 
 class _CalculationsState extends State<Calculations> {
   Item selectedUser;
-  final myController = TextEditingController();
+  String roofsize;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   List<Item> users = <Item>[
     const Item('North'),
     const Item('East'),
@@ -98,20 +99,47 @@ class _CalculationsState extends State<Calculations> {
                 SizedBox(
                   height: 37,
                   width: 100,
-                  child: TextField(
-                    decoration: InputDecoration(
-                      contentPadding: EdgeInsets.all(5),
-                      border: OutlineInputBorder(),
-                      //labelText: 'Roof size'),
+                  child: Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      validator: (input) {
+                        //_formKey.currentState.save();
+                        if (input.isEmpty) {
+                          return 'Username can not be blank';
+                        }
+                      },
+                      onSaved: (input) {
+                        roofsize = input;
+                        //_formKey.currentState.save();
+                      },
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.all(5),
+                        border: OutlineInputBorder(),
+                        //labelText: 'Roof size'),
+                      ),
                     ),
-                    controller: myController,
                   ),
                 ),
               ],
             ),
+            RaisedButton(
+                child: Text('Submit'),
+                onPressed: () {
+                  _formKey.currentState.save();
+                  submitit(roofsize);
+                }),
           ],
         ),
       ),
     );
   }
+
+  String submitit(String n) {
+    if (_formKey.currentState.validate()) {
+      _formKey.currentState.save();
+      print(n);
+      return n;
+    }
+  }
 }
+
