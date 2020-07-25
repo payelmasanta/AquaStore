@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 class Item {
   const Item(this.name);
   final String name;
@@ -187,12 +188,20 @@ class _CalculationsState extends State<Calculations> {
     );
   }
 
-  void submitit(double n, m) {
+void submitit(double n, m) {
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       result = n * m;
+      print("hey");
       print(result);
+      const url = "https://flutterupdate-f584b.firebaseio.com/pro.json";
+      http.post(
+        url,
+        body: json.encode({
+          'result': result.toDouble(),
+        }),
+      );
+      print("hey");
     }
   }
 }
-
