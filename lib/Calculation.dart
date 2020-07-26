@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:rwh_assistant/database.dart';
+
 class Item {
   const Item(this.name);
   final String name;
@@ -13,7 +15,7 @@ class Calculations extends StatefulWidget {
 
 class _CalculationsState extends State<Calculations> {
   Item selectedRegion, selectedCatchment;
-  double catchValue, roofsize, result;
+  double catchValue, roofsize, result; //catchValue is the runn-off factor
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   List<Item> region = <Item>[
     const Item('North'),
@@ -33,22 +35,32 @@ class _CalculationsState extends State<Calculations> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          //mainAxisAlignment: MainAxisAlignment.start,
+        title: Stack(
           children: <Widget>[
-            Container(
-                padding: const EdgeInsets.only(left: 40.0, right: 8.0),
-                child: Text(
-                  'Calculate Rainfall',
-                  style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
-                )),
-            Container(
-              margin: EdgeInsets.only(left: 40, right: 0),
-              child: Image.asset(
-                'assets/images/logo.png',
-                fit: BoxFit.contain,
-                height: 50,
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(left: 40.0, right: 8.0),
+                    child: Text(
+                      'Calculate Rainfall',
+                      style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
+                    )),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  //margin: EdgeInsets.only(left: 40, right: 0),
+                  child: Image.asset(
+                    'assets/images/logo.png',
+                    fit: BoxFit.contain,
+                    height: 50,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -94,11 +106,11 @@ class _CalculationsState extends State<Calculations> {
                   );
                 }).toList(),
               ),
-              Text(""),
-              Text(
-                'Select City',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              ),
+              // Text(""),
+              // Text(
+              //   'Select City',
+              //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              // ),
               Text(""),
               Row(
                 children: <Widget>[
@@ -112,6 +124,7 @@ class _CalculationsState extends State<Calculations> {
                     child: Form(
                       key: _formKey,
                       child: TextFormField(
+                        keyboardType: TextInputType.number,
                         validator: (input) {
                           if (input.isEmpty) {
                             return 'Roofsize can not be blank';
@@ -188,20 +201,25 @@ class _CalculationsState extends State<Calculations> {
     );
   }
 
-void submitit(double n, m) {
+  void submitit(double n, m) async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    final String usr = user.uid.toString();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
       result = n * m;
-      print("hey");
-      print(result);
-      const url = "https://flutterupdate-f584b.firebaseio.com/pro.json";
-      http.post(
-        url,
-        body: json.encode({
-          'result': result.toDouble(),
-        }),
-      );
-      print("hey");
     }
+    print(result);
+    DatabaseService(uid: usr).updateUserData(result.toString());
+    getData();
+  }
+
+  Future<DocumentSnapshot> getData() async {
+    var firebaseUser = await FirebaseAuth.instance.currentUser();
+    var resul = await Firestore.instance
+        .collection("result")
+        .document(firebaseUser.uid)
+        .get();
+    print(resul.data);
   }
 }
+
