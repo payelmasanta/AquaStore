@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rwh_assistant/database.dart';
 
 class Item {
@@ -14,15 +16,16 @@ class Calculations extends StatefulWidget {
 }
 
 class _CalculationsState extends State<Calculations> {
+  double resrain;
+  Future<void> _initForm;
+  final _stateList = <StateModel>[];
+  final _cityList = <City>[];
+
+  StateModel selectedState;
+  City selectedCity;
   Item selectedRegion, selectedCatchment;
   double catchValue, roofsize, result; //catchValue is the runn-off factor
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  List<Item> region = <Item>[
-    const Item('North'),
-    const Item('East'),
-    const Item('South'),
-    const Item('West'),
-  ];
 
   List<Item> catchment = <Item>[
     const Item('Tiles'),
@@ -30,6 +33,94 @@ class _CalculationsState extends State<Calculations> {
     const Item('Concrete'),
     const Item('Brick Pavement'),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _initForm = _initStateAsync();
+  }
+
+  Future<void> _initStateAsync() async {
+    _stateList.clear();
+    _stateList.addAll(await _fetchStateList());
+  }
+
+  Future<List<StateModel>> _fetchStateList() async {
+    await Future.delayed(Duration(seconds: 1));
+    return [
+      StateModel("1", "Karnataka"),
+      StateModel("2", "West Bengal"),
+      StateModel("3", "Maharashtra"),
+      StateModel("4", "Assam"),
+    ];
+  }
+
+  Future<List<City>> _fetchCityList(String id) async {
+    await Future.delayed(Duration(seconds: 1));
+    if (id == "1")
+      return [
+        City("1", "Bangalore", 150.2),
+        City("2", "Mysore", 148.1),
+      ];
+    if (id == "2")
+      return [
+        City("3", "Kolkata", 160.8),
+        City("4", "Kharagpur", 166.5),
+      ];
+    if (id == "3")
+      return [
+        City("3", "Mumbai", 160.8),
+        City("4", "Pune", 166.5),
+      ];
+    if (id == "4")
+      return [
+        City("3", "Guwahati", 160.8),
+        City("4", "Silchar", 166.5),
+      ];
+    return Iterable.empty();
+  }
+
+  void _onStateSelected(StateModel selectedState) async {
+    try {
+      _showLoadingDialog();
+      final cityList = await _fetchCityList(selectedState.id);
+      setState(() {
+        this.selectedState = selectedState;
+        selectedCity = null;
+        _cityList.clear();
+        _cityList.addAll(cityList);
+      });
+      Navigator.pop(context);
+    } catch (e) {
+      //TODO: handle error
+      rethrow;
+    }
+  }
+
+  void _onCitySelected(City selectedCity) {
+    setState(() {
+      this.selectedCity = selectedCity;
+      resrain = selectedCity.rain;
+      print(resrain);
+    });
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Center(
+            child: SpinKitCircle(
+              color: Colors.white,
+              size: 50,
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,42 +166,22 @@ class _CalculationsState extends State<Calculations> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                'Select Region',
+                'Select State and City',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
               ),
-              Text(""),
-              DropdownButton<Item>(
-                hint: Text("Select Region"),
-                value: selectedRegion,
-                onChanged: (Item Value) {
-                  setState(() {
-                    selectedRegion = Value;
-                  });
-                },
-                items: region.map((Item user) {
-                  //print(user.name);
-                  return DropdownMenuItem<Item>(
-                    value: user,
-                    child: Row(
-                      children: <Widget>[
-                        //user.icon,
-                        SizedBox(
-                          width: 10,
-                        ),
-                        Text(
-                          user.name,
-                          style: TextStyle(color: Colors.black),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
+              SafeArea(
+                child: FutureBuilder<void>(
+                  future: _initForm,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting)
+                      return _buildLoading();
+                    else if (snapshot.hasError)
+                      return _buildError(snapshot.error);
+                    else
+                      return _buildBody();
+                  },
+                ),
               ),
-              // Text(""),
-              // Text(
-              //   'Select City',
-              //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
-              // ),
               Text(""),
               Row(
                 children: <Widget>[
@@ -189,10 +260,14 @@ class _CalculationsState extends State<Calculations> {
               ),
               //catchment end
               RaisedButton(
-                  child: Text('Submit'),
+                  color: Colors.amber,
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                   onPressed: () {
                     _formKey.currentState.save();
-                    submitit(roofsize, catchValue);
+                    submitit(roofsize, catchValue, resrain);
                   }),
             ],
           ),
@@ -201,12 +276,63 @@ class _CalculationsState extends State<Calculations> {
     );
   }
 
-  void submitit(double n, m) async {
+  Widget _buildLoading() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SpinKitCircle(
+            color: Colors.blue,
+            size: 50,
+          ),
+          SizedBox(height: 50.0),
+          Text("Initilizing Form Data"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildError(dynamic error) {
+    return Center(
+      child: Text("Error occured: $error"),
+    );
+  }
+
+  Widget _buildBody() {
+    return Column(
+      children: <Widget>[
+        DropdownButtonFormField<StateModel>(
+          hint: Text('Choose State'),
+          items: _stateList
+              .map((itm) => DropdownMenuItem(
+                    child: Text(itm.name),
+                    value: itm,
+                  ))
+              .toList(),
+          value: selectedState,
+          onChanged: _onStateSelected,
+        ),
+        DropdownButtonFormField<City>(
+          hint: Text('Choose City'),
+          items: _cityList
+              .map((itm) => DropdownMenuItem(
+                    child: Text(itm.name),
+                    value: itm,
+                  ))
+              .toList(),
+          value: selectedCity,
+          onChanged: _onCitySelected,
+        ),
+      ],
+    );
+  }
+
+  void submitit(double n, m, o) async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     final String usr = user.uid.toString();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      result = n * m;
+      result = n * m * o;
     }
     print(result);
     DatabaseService(uid: usr).updateUserData(result.toString());
@@ -223,3 +349,17 @@ class _CalculationsState extends State<Calculations> {
   }
 }
 
+class StateModel {
+  final String id;
+  final String name;
+
+  StateModel(this.id, this.name);
+}
+
+class City {
+  final String id;
+  final String name;
+  final double rain;
+
+  City(this.id, this.name, this.rain);
+}
