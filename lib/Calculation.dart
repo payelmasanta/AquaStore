@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:rwh_assistant/Result.dart';
 import 'package:rwh_assistant/database.dart';
 
 class Item {
@@ -60,13 +61,13 @@ class _CalculationsState extends State<Calculations> {
     await Future.delayed(Duration(seconds: 1));
     if (id == "1")
       return [
-        City("1", "Bangalore", 150.2, 110),
-        City("2", "Mysore", 148.1, 110),
+        City("1", "Bangalore", 5, 150),
+        City("2", "Mysore", 48, 160),
       ];
     if (id == "2")
       return [
-        City("3", "Kolkata", 160.8, 100),
-        City("4", "Kharagpur", 166.5, 100),
+        City("3", "Kolkata", 85, 180),
+        City("4", "Kharagpur", 66, 270),
       ];
     return Iterable.empty();
   }
@@ -105,7 +106,10 @@ class _CalculationsState extends State<Calculations> {
         return WillPopScope(
           onWillPop: () async => false,
           child: Center(
-            child: CupertinoActivityIndicator(animating: true),
+            child: SpinKitCircle(
+              color: Colors.white,
+              size: 50,
+            ),
           ),
         );
       },
@@ -327,8 +331,11 @@ class _CalculationsState extends State<Calculations> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           CupertinoActivityIndicator(animating: true),
-          SizedBox(height: 10.0),
-          Text("Initilizing Form Data"),
+          SizedBox(height: 25.0),
+          Text(
+            "Initilizing Form Data",
+            style: TextStyle(fontSize: 15),
+          ),
         ],
       ),
     );
@@ -404,13 +411,27 @@ class _CalculationsState extends State<Calculations> {
     getData();
   }
 
-  Future<DocumentSnapshot> getData() async {
+  Future<void> getData() async {
     var firebaseUser = await FirebaseAuth.instance.currentUser();
     var resul = await Firestore.instance
         .collection("result")
         .document(firebaseUser.uid)
         .get();
     print(resul.data);
+    if (resul.data != null) {
+      Column(
+        children: <Widget>[
+          Text("The rainfall varies from"),
+          Text(resul.data.toString()),
+        ],
+      );
+    }
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ResultPage(resul.data.toString()),
+        ));
   }
 }
 
