@@ -5,6 +5,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rwh_assistant/Result.dart';
 import 'package:rwh_assistant/database.dart';
+import './database1.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoder/geocoder.dart';
+import 'package:app_settings/app_settings.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Item {
   const Item(this.name);
@@ -13,22 +19,21 @@ class Item {
 
 class Calculations extends StatefulWidget {
   @override
-  _CalculationsState createState() => _CalculationsState();
+  CalculationsState createState() => CalculationsState();
 }
 
-class _CalculationsState extends State<Calculations> {
-  Future<void> _initForm;
-  final _stateList = <StateModel>[];
-  final _cityList = <City>[];
-  double resrain_dry, resrain_wet, demand;
+class CalculationsState extends State<Calculations> {
+  String mondry, monwet;
+  double raindry, rainwet;
+  var use = new List();
+  bool isData = false;
+  String locationMessage = "", place;
+  String placeName = '';
+  double resrain_dry = 7, resrain_wet = 8, demand;
+  double result_dry, result_wet;
   int people;
-  StateModel selectedState;
-  City selectedCity;
   Item selectedRegion, selectedCatchment;
-  double catchValue,
-      roofsize,
-      result_dry,
-      result_wet; //catchValue is the runn-off factor
+  double catchValue, roofsize; //catchValue is the runn-off factor
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   List<Item> catchment = <Item>[
@@ -38,82 +43,60 @@ class _CalculationsState extends State<Calculations> {
     const Item('Brick Pavement'),
   ];
 
-  @override
-  void initState() {
-    super.initState();
-    _initForm = _initStateAsync();
-  }
-
-  Future<void> _initStateAsync() async {
-    _stateList.clear();
-    _stateList.addAll(await _fetchStateList());
-  }
-
-  Future<List<StateModel>> _fetchStateList() async {
-    await Future.delayed(Duration(seconds: 1));
-    return [
-      StateModel("1", "Karnataka"),
-      StateModel("2", "West Bengal"),
-    ];
-  }
-
-  Future<List<City>> _fetchCityList(String id) async {
-    await Future.delayed(Duration(seconds: 1));
-    if (id == "1")
-      return [
-        City("1", "Bangalore", 5, 150),
-        City("2", "Mysore", 48, 160),
-      ];
-    if (id == "2")
-      return [
-        City("3", "Kolkata", 85, 180),
-        City("4", "Kharagpur", 66, 270),
-      ];
-    return Iterable.empty();
-  }
-
-  void _onStateSelected(StateModel selectedState) async {
-    try {
-      _showLoadingDialog();
-      final cityList = await _fetchCityList(selectedState.id);
+  Future getCurrentLocation() async {
+    bool isLocationEnabled = await Geolocator().isLocationServiceEnabled();
+    if (isLocationEnabled) {
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      debugPrint('location: ${position.latitude}');
+      final coordinates =
+          new Coordinates(position.latitude, position.longitude);
+      var addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      var first = addresses.first;
+      print("${first.featureName} : ${first.addressLine}");
       setState(() {
-        this.selectedState = selectedState;
-        selectedCity = null;
-        _cityList.clear();
-        _cityList.addAll(cityList);
+        locationMessage = "${position.latitude}, ${position.longitude}";
+        placeName = " ${first.subAdminArea}";
+        print(placeName);
       });
-      Navigator.pop(context);
-    } catch (e) {
-      //TODO: handle error
-      rethrow;
+      return placeName;
+    } else {
+      showDialog(
+          context: context, builder: (BuildContext context) => errorDialog);
+      // AppSettings.openLocationSettings();
     }
   }
 
-  void onCitySelected(City selectedCity) {
-    setState(() {
-      this.selectedCity = selectedCity;
-      resrain_dry = selectedCity.dry_rain;
-      resrain_wet = selectedCity.wet_rain;
-      print(resrain_dry);
-      print(resrain_wet);
-    });
-  }
-
-  void _showLoadingDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return WillPopScope(
-          onWillPop: () async => false,
-          child: Center(
-            child: SpinKitCircle(
-              color: Colors.white,
-              size: 50,
-            ),
-          ),
-        );
-      },
+  FetchJSON() async {
+    var Response = await http.get(
+      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/23d260a2bed3b9d0e94be49d6da6a0be98b89b86/random.json",
+      headers: {"Accept": "application/json"},
     );
+    //var kar = "Mysuru";
+    if (Response.statusCode == 200) {
+      String responseBody = Response.body;
+      var responseJSON = json.decode(responseBody);
+      place = '$placeName';
+      print('\"$place\"');
+
+      mondry = responseJSON["$place"]["month_dry"];
+      print(mondry);
+      raindry = responseJSON["$place"]["rain_dry"];
+      monwet = responseJSON["$place"]["month_wet"];
+      rainwet = responseJSON["$place"]["rain_wet"];
+
+      print(mondry);
+      print(raindry);
+      print(monwet);
+      print(rainwet);
+      isData = true;
+      setState(() {
+        print('UI Updated');
+      });
+    } else {
+      print('Something went wrong. \nResponse Code : ${Response.statusCode}');
+    }
   }
 
   @override
@@ -131,12 +114,13 @@ class _CalculationsState extends State<Calculations> {
                 height: 50,
               ),
             ),
-            Container(
-                padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-                child: Text(
-                  'Calculate Rainfall',
-                  style: TextStyle(fontFamily: 'Open Sans'),
-                )),
+            // Container(
+            //   padding: const EdgeInsets.only(left: 0.0, right: 0.0),
+            //   child: Text(
+            //     'Calculate Rainfall',
+            //     style: TextStyle(fontFamily: 'Open Sans'),
+            //   ),
+            // ),
           ],
         ),
       ),
@@ -150,25 +134,18 @@ class _CalculationsState extends State<Calculations> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Container(
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                child: Text(
-                  'Select State and City',
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-                ),
+              FlatButton(
+                onPressed: () {
+                  getCurrentLocation();
+                },
+                color: Colors.green,
+                child: Text("Get Location"),
               ),
-              SafeArea(
-                child: FutureBuilder<void>(
-                  future: _initForm,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      return _buildLoading();
-                    else if (snapshot.hasError)
-                      return _buildError(snapshot.error);
-                    else
-                      return _buildBody();
-                  },
-                ),
+              Row(
+                children: <Widget>[
+                  Icon(Icons.location_on),
+                  Text(placeName),
+                ],
               ),
               Text(""),
               Text(''),
@@ -240,6 +217,7 @@ class _CalculationsState extends State<Calculations> {
                         },
                         onSaved: (input) {
                           demand = double.parse(input);
+                          //print(demand);
                         },
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.all(5),
@@ -253,7 +231,7 @@ class _CalculationsState extends State<Calculations> {
               // catchment start
               Text(
                   "The minimum water demand according to the World Health Organization (WHO) is "
-                  "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day"),
+                  "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
               Text(""),
               Text(''),
               Text(''),
@@ -325,128 +303,76 @@ class _CalculationsState extends State<Calculations> {
     );
   }
 
-  Widget _buildLoading() {
-    return Center(
+  Dialog errorDialog = Dialog(
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0)), //this right here
+    child: Container(
+      height: 200.0,
+      width: 300.0,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          CupertinoActivityIndicator(animating: true),
-          SizedBox(height: 25.0),
-          Text(
-            "Initilizing Form Data",
-            style: TextStyle(fontSize: 15),
+          Text(""),
+          Text(""),
+          Container(
+            padding: EdgeInsets.only(left: 20, right: 15),
+            child: Text(
+              'To continue, turn on device location.',
+              style: TextStyle(fontSize: 22, color: Colors.grey),
+            ),
           ),
+          Text(""),
+          Container(
+              padding: EdgeInsets.only(left: 40, top: 40),
+              margin: EdgeInsets.only(bottom: 10, right: 1),
+              child: FlatButton(
+                onPressed: () {
+                  AppSettings.openLocationSettings();
+                },
+                child: Text(
+                  'Go to Location settings >>',
+                  style: TextStyle(color: Colors.blue, fontSize: 17.0),
+                ),
+              )),
         ],
       ),
-    );
-  }
+    ),
+  );
 
-  Widget _buildError(dynamic error) {
-    return Center(
-      child: Text("Error occured: $error"),
-    );
-  }
-
-  Widget _buildBody() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Container(
-          width: 150,
-          //padding: EdgeInsets.only(left:10, right:0),
-          child: DropdownButtonFormField<StateModel>(
-            hint: Text('Choose State'),
-            items: _stateList
-                .map((itm) => DropdownMenuItem(
-                      value: itm,
-                      child: Row(
-                        children: <Widget>[
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text(
-                            itm.name,
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ],
-                      ),
-                    ))
-                .toList(),
-            value: selectedState,
-            onChanged: _onStateSelected,
-          ),
-        ),
-        Container(
-          width: 150,
-          //padding: EdgeInsets.only(left:10, right:0),
-          child: DropdownButtonFormField<City>(
-            hint: Text('Choose City'),
-            items: _cityList
-                .map((itm) => DropdownMenuItem(
-                      child: Text(itm.name),
-                      value: itm,
-                    ))
-                .toList(),
-            value: selectedCity,
-            onChanged: onCitySelected,
-          ),
-        )
-      ],
-    );
-  }
-
-  void submitit(double n, m, d, w) async {
+  void submitit(double roofsize, catvalue, resrd, resrw) async {
+    FetchJSON();
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     final String usr = user.uid.toString();
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      result_dry = (n * m) * d;
-      result_wet = (n * m) * w;
+      result_dry = (roofsize * catvalue) * resrd;
+      result_wet = (roofsize * catvalue) * resrw;
       print(result_dry);
       print(result_wet);
     }
 
-    DatabaseService(uid: usr)
-        .updateUserData(result_dry.toString(), result_wet.toString());
+    DatabaseService(uid: usr).updateUserData(result_dry.toString());
+    getData();
+    DatabaseServicee(uid: usr).updateUserDataa(result_wet.toString());
     getData();
   }
 
   Future<void> getData() async {
     var firebaseUser = await FirebaseAuth.instance.currentUser();
     var resul = await Firestore.instance
-        .collection("result")
+        .collection("result_dry")
         .document(firebaseUser.uid)
         .get();
-    print(resul.data);
-    if (resul.data != null) {
-      Column(
-        children: <Widget>[
-          Text("The rainfall varies from"),
-          Text(resul.data.toString()),
-        ],
-      );
-    }
 
+    var resul1 = await Firestore.instance
+        .collection("result_wet")
+        .document(firebaseUser.uid)
+        .get();
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => ResultPage(resul.data.toString()),
+          builder: (context) => ResultPage(resul.data.values.toString(),
+              resul1.data.values.toString(), demand, people),
         ));
   }
-}
-
-class StateModel {
-  final String id;
-  final String name;
-
-  StateModel(this.id, this.name);
-}
-
-class City {
-  final String id;
-  final String name;
-  final double dry_rain;
-  final double wet_rain;
-
-  City(this.id, this.name, this.dry_rain, this.wet_rain);
 }
