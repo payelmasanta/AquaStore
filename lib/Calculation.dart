@@ -70,18 +70,16 @@ class CalculationsState extends State<Calculations> {
 
   FetchJSON() async {
     var Response = await http.get(
-      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/23d260a2bed3b9d0e94be49d6da6a0be98b89b86/random.json",
+      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/009c32dd19d7a45cf704987579d2d24d5a89de5e/kuchbhi.json",
       headers: {"Accept": "application/json"},
     );
     //var kar = "Mysuru";
     if (Response.statusCode == 200) {
       String responseBody = Response.body;
       var responseJSON = json.decode(responseBody);
-      place = '$placeName';
-      print('\"$place\"');
+      place = "$placeName";
 
       mondry = responseJSON["$place"]["month_dry"];
-      print(mondry);
       raindry = responseJSON["$place"]["rain_dry"];
       monwet = responseJSON["$place"]["month_wet"];
       rainwet = responseJSON["$place"]["rain_wet"];
@@ -132,170 +130,184 @@ class CalculationsState extends State<Calculations> {
             left: 5,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            //crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  getCurrentLocation();
-                },
-                color: Colors.green,
-                child: Text("Get Location"),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      getCurrentLocation();
+                    },
+                    color: Colors.green,
+                    child: Text("Get Location"),
+                  ),
+                ],
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
                   Icon(Icons.location_on),
                   Text(placeName),
                 ],
               ),
-              Text(""),
-              Text(''),
-              Container(
-                width: 300,
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        'Enter the roof size (in m\u00B2):     ',
-                        style: TextStyle(
-                            fontSize: 21, fontWeight: FontWeight.bold),
-                      ),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        validator: (input) {
-                          if (input.isEmpty) {
-                            return ('Roofsize can not be blank');
-                          }
-                        },
-                        onSaved: (input) {
-                          roofsize = double.parse(input);
-                        },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(5),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      Text(''),
-                      Text(''),
-                      Text(
-                        'Number of People using the water:',
-                        style: TextStyle(
-                          fontSize: 21,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        validator: (input) {
-                          if (input.isEmpty) {
-                            return ('This field can not be blank');
-                          }
-                        },
-                        onSaved: (input) {
-                          people = int.parse(input);
-                        },
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(5),
-                          border: OutlineInputBorder(),
-                        ),
-                      ),
-                      Text(''),
-                      Text(''),
-                      Text(
-                        'Water demand per person:',
-                        style: TextStyle(
-                            fontSize: 21, fontWeight: FontWeight.bold),
-                      ),
-                      TextFormField(
-                        keyboardType: TextInputType.number,
-                        validator: (input) {
-                          if (input.isEmpty) {
-                            return ('This field  can not be blank');
-                          }
-                        },
-                        onSaved: (input) {
-                          demand = double.parse(input);
-                          //print(demand);
-                        },
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(5),
-                            border: OutlineInputBorder(),
-                            hintText: "(Eg: 20 liters per day per person)"),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // catchment start
-              Text(
-                  "The minimum water demand according to the World Health Organization (WHO) is "
-                  "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
-              Text(""),
-              Text(''),
-              Text(''),
-              Container(
-                //padding: EdgeInsets.only(left:10, right:0),
-                child: Text(
-                  'Select Catchment Type:',
-                  style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
-                ),
-              ),
-              Container(
-                //padding: EdgeInsets.only(left:10, right:0),
-                child: DropdownButton<Item>(
-                  hint: Text("Select Catchment Type"),
-                  value: selectedCatchment,
-                  onChanged: (Item Value) {
-                    setState(() {
-                      selectedCatchment = Value;
-                      if (selectedCatchment.name == "Tiles") {
-                        catchValue = 0.85;
-                        //print(catchValue);
-                      } else if (selectedCatchment.name ==
-                          "Corrugated Metal Sheets") {
-                        catchValue = 0.8;
-                        //print(catchValue);
-                      } else if (selectedCatchment.name == "Concrete") {
-                        catchValue = 0.7;
-                        //print(catchValue);
-                      } else {
-                        catchValue = 0.55;
-                        //print(catchValue);
-                      }
-                    });
-                  },
-                  items: catchment.map((Item user) {
-                    return DropdownMenuItem<Item>(
-                      value: user,
-                      child: Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Text(""),
+                  Text(''),
+                  Container(
+                    width: 300,
+                    padding: EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          SizedBox(
-                            width: 10,
-                          ),
                           Text(
-                            user.name,
-                            style: TextStyle(color: Colors.black),
+                            'Enter the roof size (in m\u00B2):     ',
+                            style: TextStyle(
+                                fontSize: 21, fontWeight: FontWeight.bold),
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            validator: (input) {
+                              if (input.isEmpty) {
+                                return ('Roofsize can not be blank');
+                              }
+                            },
+                            onSaved: (input) {
+                              roofsize = double.parse(input);
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(5),
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          Text(''),
+                          Text(''),
+                          Text(
+                            'Number of People using the water:',
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            validator: (input) {
+                              if (input.isEmpty) {
+                                return ('This field can not be blank');
+                              }
+                            },
+                            onSaved: (input) {
+                              people = int.parse(input);
+                            },
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(5),
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          Text(''),
+                          Text(''),
+                          Text(
+                            'Water demand per person:',
+                            style: TextStyle(
+                                fontSize: 21, fontWeight: FontWeight.bold),
+                          ),
+                          TextFormField(
+                            keyboardType: TextInputType.number,
+                            validator: (input) {
+                              if (input.isEmpty) {
+                                return ('This field  can not be blank');
+                              }
+                            },
+                            onSaved: (input) {
+                              demand = double.parse(input);
+                              //print(demand);
+                            },
+                            decoration: InputDecoration(
+                                contentPadding: EdgeInsets.all(5),
+                                border: OutlineInputBorder(),
+                                hintText: "(Eg: 20 liters per day per person)"),
                           ),
                         ],
                       ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              //catchment end
-              RaisedButton(
-                  padding: EdgeInsets.only(left: 0, right: 0),
-                  color: Colors.amber,
-                  child: Text(
-                    'Submit',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
-                  onPressed: () {
-                    _formKey.currentState.save();
-                    submitit(roofsize, catchValue, resrain_dry, resrain_wet);
-                  }),
+                  // catchment start
+                  Text(
+                      "The minimum water demand according to the World Health Organization (WHO) is "
+                      "20 litres per day. In semi-arid areas people often use less than 20 liters per person per day."),
+                  Text(""),
+                  Text(''),
+                  Text(''),
+                  Container(
+                    //padding: EdgeInsets.only(left:10, right:0),
+                    child: Text(
+                      'Select Catchment Type:',
+                      style:
+                          TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                  Container(
+                    //padding: EdgeInsets.only(left:10, right:0),
+                    child: DropdownButton<Item>(
+                      hint: Text("Select Catchment Type"),
+                      value: selectedCatchment,
+                      onChanged: (Item Value) {
+                        setState(() {
+                          selectedCatchment = Value;
+                          if (selectedCatchment.name == "Tiles") {
+                            catchValue = 0.85;
+                            //print(catchValue);
+                          } else if (selectedCatchment.name ==
+                              "Corrugated Metal Sheets") {
+                            catchValue = 0.8;
+                            //print(catchValue);
+                          } else if (selectedCatchment.name == "Concrete") {
+                            catchValue = 0.7;
+                            //print(catchValue);
+                          } else {
+                            catchValue = 0.55;
+                            //print(catchValue);
+                          }
+                          FetchJSON();
+                        });
+                      },
+                      items: catchment.map((Item user) {
+                        return DropdownMenuItem<Item>(
+                          value: user,
+                          child: Row(
+                            children: <Widget>[
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Text(
+                                user.name,
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  //catchment end
+                  RaisedButton(
+                    padding: EdgeInsets.only(left: 0, right: 0),
+                    color: Colors.amber,
+                    child: Text(
+                      'Submit',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () {
+                      _formKey.currentState.save();
+                      submitit(roofsize, catchValue, raindry, rainwet);
+                    },
+                  ),
+                ],
+              ),
             ],
           ),
         ),
@@ -340,7 +352,6 @@ class CalculationsState extends State<Calculations> {
   );
 
   void submitit(double roofsize, catvalue, resrd, resrw) async {
-    FetchJSON();
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     final String usr = user.uid.toString();
     if (_formKey.currentState.validate()) {
@@ -369,10 +380,21 @@ class CalculationsState extends State<Calculations> {
         .document(firebaseUser.uid)
         .get();
     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ResultPage(resul.data.values.toString(),
-              resul1.data.values.toString(), demand, people),
-        ));
+      context,
+      MaterialPageRoute(
+        builder: (context) => ResultPage(
+            resul.data.values.toString(),
+            resul1.data.values.toString(),
+            demand,
+            people,
+            mondry,
+            monwet,
+            selectedCatchment.name.toString(),
+            raindry,
+            rainwet,
+            roofsize,
+            catchValue),
+      ),
+    );
   }
 }
