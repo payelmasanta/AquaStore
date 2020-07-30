@@ -149,14 +149,13 @@ class _StepperClassState extends State<StepperClass> {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          SizedBox(
-            height: 20,
-            width: 30.0,
-          ),
+          Container(
+       
           Text(
             "Congratulations!\nYou've successfully built a RWH system.",
             style: TextStyle(color: Colors.white),
           ),
+               ),
         ],
       ),
     );
