@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:rwh_assistant/Calculation.dart';
+import 'package:rwh_assistant/Result.dart';
+import 'package:rwh_assistant/condition.dart';
+import 'package:rwh_assistant/connect_vendors.dart';
 import 'package:rwh_assistant/home_page.dart';
-
-import './login_page.dart';
 
 void main() => runApp(MyApp());
 
@@ -33,7 +35,7 @@ class MyApp extends StatelessWidget {
               ),
         ),
       ),
-      home: MyHomePage(),
+      home: Condition(),
     );
   }
 }
