@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+//import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:rwh_assistant/Result.dart';
 import 'package:rwh_assistant/database.dart';
 import './database1.dart';
@@ -70,7 +70,7 @@ class CalculationsState extends State<Calculations> {
 
   FetchJSON() async {
     var Response = await http.get(
-      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/009c32dd19d7a45cf704987579d2d24d5a89de5e/kuchbhi.json",
+      "https://gist.githubusercontent.com/payelmasanta/51322f0c991e57011ca3456cbe153d3d/raw/3a7149640cc02de19489f0bb18f586057ec4a006/kuchbhi.json",
       headers: {"Accept": "application/json"},
     );
     //var kar = "Mysuru";
@@ -101,24 +101,34 @@ class CalculationsState extends State<Calculations> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Container(
-              margin: EdgeInsets.only(left: 5, right: 20),
-              child: Image.asset(
-                'assets/images/logo.png',
-                fit: BoxFit.contain,
-                height: 50,
-              ),
+        backgroundColor: Colors.blue[900],
+        title: Stack(
+          children: <Widget>[
+            Row(
+              //mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Container(
+                    margin: EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.only(left: 40.0, right: 8.0),
+                    child: Text(
+                      'Calculate Rainfall',
+                      style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
+                    )),
+              ],
             ),
-            // Container(
-            //   padding: const EdgeInsets.only(left: 0.0, right: 0.0),
-            //   child: Text(
-            //     'Calculate Rainfall',
-            //     style: TextStyle(fontFamily: 'Open Sans'),
-            //   ),
-            // ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  //margin: EdgeInsets.only(left: 83, right: 0),
+                  child: Image.asset(
+                    'assets/images/logo1.jpeg',
+                    fit: BoxFit.contain,
+                    height: 50,
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
@@ -139,8 +149,11 @@ class CalculationsState extends State<Calculations> {
                     onPressed: () {
                       getCurrentLocation();
                     },
-                    color: Colors.green,
-                    child: Text("Get Location"),
+                    color: Colors.blue[300],
+                    child: Text(
+                      "Get Location",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ],
               ),
@@ -294,17 +307,27 @@ class CalculationsState extends State<Calculations> {
                     ),
                   ),
                   //catchment end
-                  RaisedButton(
-                    padding: EdgeInsets.only(left: 0, right: 0),
-                    color: Colors.amber,
-                    child: Text(
-                      'Submit',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                  Text(""),
+                  Container(
+                    padding: EdgeInsets.only(right: 20, bottom: 10),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        RaisedButton(
+                          padding: EdgeInsets.only(left: 0, right: 0),
+                          color: Colors.blue[300],
+                          child: Text(
+                            'Submit',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 18),
+                          ),
+                          onPressed: () {
+                            _formKey.currentState.save();
+                            submitit(roofsize, catchValue, raindry, rainwet);
+                          },
+                        ),
+                      ],
                     ),
-                    onPressed: () {
-                      _formKey.currentState.save();
-                      submitit(roofsize, catchValue, raindry, rainwet);
-                    },
                   ),
                 ],
               ),
