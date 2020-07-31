@@ -33,7 +33,7 @@ class MyHomePageState extends State<MyHomePage> {
                 Container(
                   //margin: EdgeInsets.only(left: 0, right: 50),
                   child: Image.asset(
-                    'assets/images/logo.png',
+                    'assets/images/logo1.jpeg',
                     fit: BoxFit.contain,
                     height: 50,
                   ),
@@ -76,8 +76,8 @@ class MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: Container(
-        height: double.infinity,
-        width: double.infinity,
+        // height: double.infinity,
+        // width: double.infinity,
         child: SingleChildScrollView(
           physics: AlwaysScrollableScrollPhysics(),
           padding: EdgeInsets.symmetric(
@@ -155,6 +155,19 @@ class MyHomePageState extends State<MyHomePage> {
                 child: Padding(
                   padding: const EdgeInsets.all(0),
                   child: Container(),
+                ),
+              ),
+              Container(
+                height: 900,
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 30, horizontal: 0),
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    fit: BoxFit.fill,
+                    image: AssetImage(
+                      'assets/images/home1.png',
+                    ),
+                  ),
                 ),
               ),
             ],
