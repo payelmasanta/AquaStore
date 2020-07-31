@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import './Calculation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
@@ -167,18 +166,20 @@ class ConnectVendorsState extends State<ConnectVendors> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.blue[900],
         title: Stack(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
-                    margin: EdgeInsets.only(top: 10),
-                    //padding: const EdgeInsets.only(left: 15.0, right: 8.0),
-                    child: Text(
-                      'Connect with vendors',
-                      style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
-                    )),
+                  margin: EdgeInsets.only(top: 10),
+                  //padding: const EdgeInsets.only(left: 15.0, right: 8.0),
+                  child: Text(
+                    'Connect with vendors',
+                    style: TextStyle(fontFamily: 'Open Sans', fontSize: 23),
+                  ),
+                ),
               ],
             ),
             Row(
@@ -187,7 +188,7 @@ class ConnectVendorsState extends State<ConnectVendors> {
                 Container(
                   //margin: EdgeInsets.only(left: 25, right: 0),
                   child: Image.asset(
-                    'assets/images/logo.png',
+                    'assets/images/logo1.jpeg',
                     fit: BoxFit.contain,
                     height: 50,
                   ),
@@ -207,8 +208,11 @@ class ConnectVendorsState extends State<ConnectVendors> {
                   FetchJSON();
                 });
               },
-              color: Colors.green,
-              child: Text("Get Location"),
+              color: Colors.blue[300],
+              child: Text(
+                "Get Location",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -217,192 +221,303 @@ class ConnectVendorsState extends State<ConnectVendors> {
                 Text(place),
               ],
             ),
-            Card(
-              elevation: 10,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    leading: Icon(Icons.location_on),
-                    title: Text(
-                      'Name : $username',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Phone number : $phone \n'
-                          'Ratings : $ratings',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[700]),
-                        ),
-                        RichText(
-                          text: new TextSpan(
-                            children: [
-                              new TextSpan(
-                                text: 'Website: ',
-                                style: new TextStyle(
-                                    color: Colors.grey[700],
+            Container(
+              padding: EdgeInsets.only(right: 20, left: 20),
+              child: Card(
+                color: Colors.blue[100],
+                elevation: 10,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(""),
+                    ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Icon(Icons.location_on),
+                          Text(
+                            ' Name :  $username',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      subtitle: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.phone),
+                              Text(
+                                ' Phone :  $phone',
+                                style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              new TextSpan(
-                                text: 'Click on this',
-                                style: new TextStyle(
-                                    color: Colors.blue, fontSize: 15),
-                                recognizer: new TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launch('$website');
-                                  },
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
                               ),
                             ],
                           ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.star),
+                              Text(
+                                ' Ratings :  $ratings',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.public),
+                              RichText(
+                                text: new TextSpan(
+                                  children: [
+                                    new TextSpan(
+                                      text: ' Website :   ',
+                                      style: new TextStyle(
+                                          color: Colors.grey[900],
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    new TextSpan(
+                                      text: 'Click on this',
+                                      style: new TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue[900],
+                                          fontSize: 15),
+                                      recognizer: new TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launch('$website');
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ButtonBar(
+                      children: <Widget>[
+                        FlatButton(
+                          child: const Text(
+                            'Show location',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          onPressed: () {
+                            _launchURL();
+                          },
                         ),
                       ],
                     ),
-                  ),
-                  ButtonBar(
-                    children: <Widget>[
-                      FlatButton(
-                        child: const Text('Show location'),
-                        onPressed: () {
-                          _launchURL();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Text(''),
-            Card(
-              elevation: 10,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    leading: Icon(Icons.location_on),
-                    title: Text(
-                      'Name : $username2',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Phone number : $phone2 \n'
-                          'Ratings : $ratings2',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[700]),
-                        ),
-                        RichText(
-                          text: new TextSpan(
-                            children: [
-                              new TextSpan(
-                                text: 'Website: ',
-                                style: new TextStyle(
-                                    color: Colors.grey[700],
+            Container(
+              padding: EdgeInsets.only(right: 20, left: 20),
+              child: Card(
+                color: Colors.blue[100],
+                elevation: 10,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(""),
+                    ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Icon(Icons.location_on),
+                          Text(
+                            ' Name :  $username2',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      subtitle: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.phone),
+                              Text(
+                                ' Phone :  $phone2',
+                                style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              new TextSpan(
-                                text: 'Click on this',
-                                style: new TextStyle(
-                                    color: Colors.blue, fontSize: 15),
-                                recognizer: new TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launch('$website2');
-                                  },
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
                               ),
                             ],
                           ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.star),
+                              Text(
+                                ' Ratings :  $ratings2',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.public),
+                              RichText(
+                                text: new TextSpan(
+                                  children: [
+                                    new TextSpan(
+                                      text: ' Website :   ',
+                                      style: new TextStyle(
+                                          color: Colors.grey[900],
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    new TextSpan(
+                                      text: 'Click on this',
+                                      style: new TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue[900],
+                                          fontSize: 15),
+                                      recognizer: new TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launch('$website2');
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ButtonBar(
+                      children: <Widget>[
+                        FlatButton(
+                          child: const Text(
+                            'Show location',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          onPressed: () {
+                            _launchURL2();
+                          },
                         ),
                       ],
                     ),
-                  ),
-                  ButtonBar(
-                    children: <Widget>[
-                      FlatButton(
-                        child: const Text('Show location'),
-                        onPressed: () {
-                          _launchURL2();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Text(''),
-            Card(
-              elevation: 10,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  ListTile(
-                    leading: Icon(Icons.location_on),
-                    title: Text(
-                      'Name : $username3',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                    ),
-                    subtitle: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text(
-                          'Phone number : $phone3 \n'
-                          'Ratings : $ratings3',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.grey[700]),
-                        ),
-                        RichText(
-                          text: new TextSpan(
-                            children: [
-                              new TextSpan(
-                                text: 'Website: ',
-                                style: new TextStyle(
-                                    color: Colors.grey[700],
+            Container(
+              padding: EdgeInsets.only(right: 20, left: 20),
+              child: Card(
+                color: Colors.blue[100],
+                elevation: 10,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    Text(""),
+                    ListTile(
+                      title: Row(
+                        children: <Widget>[
+                          Icon(Icons.location_on),
+                          Text(
+                            ' Name :  $username3',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      subtitle: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.phone),
+                              Text(
+                                ' Phone :  $phone3',
+                                style: TextStyle(
                                     fontSize: 15,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              new TextSpan(
-                                text: 'Click on this',
-                                style: new TextStyle(
-                                    color: Colors.blue, fontSize: 15),
-                                recognizer: new TapGestureRecognizer()
-                                  ..onTap = () {
-                                    launch('$website3');
-                                  },
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
                               ),
                             ],
                           ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.star),
+                              Text(
+                                ' Ratings :  $ratings3',
+                                style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.grey[900]),
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: <Widget>[
+                              Icon(Icons.public),
+                              RichText(
+                                text: new TextSpan(
+                                  children: [
+                                    new TextSpan(
+                                      text: ' Website :   ',
+                                      style: new TextStyle(
+                                          color: Colors.grey[900],
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                    new TextSpan(
+                                      text: 'Click on this',
+                                      style: new TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          color: Colors.blue[900],
+                                          fontSize: 15),
+                                      recognizer: new TapGestureRecognizer()
+                                        ..onTap = () {
+                                          launch('$website3');
+                                        },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    ButtonBar(
+                      children: <Widget>[
+                        FlatButton(
+                          child: const Text(
+                            'Show location',
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          onPressed: () {
+                            _launchURL3();
+                          },
                         ),
                       ],
                     ),
-                  ),
-                  ButtonBar(
-                    children: <Widget>[
-                      FlatButton(
-                        child: const Text('Show location'),
-                        onPressed: () {
-                          _launchURL3();
-                        },
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
