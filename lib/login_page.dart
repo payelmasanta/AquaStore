@@ -5,6 +5,7 @@ import './forgot_pass.dart';
 import './signup_page.dart';
 import 'dart:async';
 import './home_page.dart';
+import './loading.dart';
 
 final kHintTextStyle = TextStyle(
   color: Colors.white70,
@@ -22,179 +23,190 @@ final kLabelStyle = TextStyle(
 
 class LoginPage extends StatefulWidget {
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool loading = false;
   String email, password;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  Future<FirebaseUser> getUser() {
+    return _auth.currentUser();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: <Widget>[
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xFF73AEF5),
-                  Color(0xFF61A4F1),
-                  Color(0xFF478DE0),
-                  Color(0xFF398AE5),
-                ],
-                stops: [0.1, 0.4, 0.7, 0.9],
-              ),
-            ),
-          ),
-          Container(
-            height: double.infinity,
-            width: double.infinity,
-            child: SingleChildScrollView(
-              physics: AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.symmetric(
-                horizontal: 40,
-                vertical: 130,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                    'Sign In',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontFamily: 'OpenSans',
-                      fontSize: 35,
-                      fontWeight: FontWeight.bold,
+    return loading
+        ? Loading()
+        : Scaffold(
+            body: Stack(
+              children: <Widget>[
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Color(0xFF73AEF5),
+                        Color(0xFF61A4F1),
+                        Color(0xFF478DE0),
+                        Color(0xFF398AE5),
+                      ],
+                      stops: [0.1, 0.4, 0.7, 0.9],
                     ),
                   ),
-                  SizedBox(height: 30),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                        height: 300,
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text("Email:", style: kLabelStyle),
-                              TextFormField(
-                                keyboardType: TextInputType.emailAddress,
-                                validator: validateEmail,
-                                onSaved: (input) => email = input,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(top: 12),
-                                  prefixIcon:
-                                      Icon(Icons.email, color: Colors.white),
-                                  hintText: 'Enter your Email',
-                                  hintStyle: kHintTextStyle,
+                ),
+                Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 40,
+                      vertical: 100,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Text(
+                          'Sign In',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'OpenSans',
+                            fontSize: 35,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 30),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Container(
+                              height: 300,
+                              child: Form(
+                                key: _formKey,
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text("Email:", style: kLabelStyle),
+                                    TextFormField(
+                                      keyboardType: TextInputType.emailAddress,
+                                      validator: validateEmail,
+                                      onSaved: (input) => email = input,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            EdgeInsets.only(top: 12),
+                                        prefixIcon: Icon(Icons.email,
+                                            color: Colors.white),
+                                        hintText: 'Enter your Email',
+                                        hintStyle: kHintTextStyle,
+                                      ),
+                                    ),
+                                    Text(""),
+                                    Text(""),
+                                    Text("Password:", style: kLabelStyle),
+                                    TextFormField(
+                                      obscureText: true,
+                                      onSaved: (input) => password = input,
+                                      validator: (input) {
+                                        if (input.length < 6) {
+                                          return 'Please enter a valid password';
+                                        }
+                                      },
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        contentPadding:
+                                            EdgeInsets.only(top: 12),
+                                        prefixIcon: Icon(Icons.lock,
+                                            color: Colors.white),
+                                        hintText: 'Enter Password',
+                                        hintStyle: kHintTextStyle,
+                                      ),
+                                    ),
+                                    FlatButton(
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ForgotPass(),
+                                          )),
+                                      padding: EdgeInsets.only(right: 0),
+                                      child: Text(
+                                        'Forgot Password?',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              Text(""),
-                              Text(""),
-                              Text("Password:", style: kLabelStyle),
-                              TextFormField(
-                                obscureText: true,
-                                onSaved: (input) => password = input,
-                                validator: (input) {
-                                  if (input.length < 6) {
-                                    return 'Please enter a valid password';
-                                  }
-                                },
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  contentPadding: EdgeInsets.only(top: 12),
-                                  prefixIcon:
-                                      Icon(Icons.lock, color: Colors.white),
-                                  hintText: 'Enter Password',
-                                  hintStyle: kHintTextStyle,
+                            ),
+                            Container(
+                              height: 50,
+                              width: double.infinity,
+                              margin: EdgeInsets.all(20),
+                              child: RaisedButton(
+                                elevation: 10,
+                                padding: EdgeInsets.all(8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
+                                child: Text(
+                                  'Sign In',
+                                  style: TextStyle(
+                                      color: Color(0xFF527DAA),
+                                      letterSpacing: 1.5,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      fontFamily: 'OpenSans'),
+                                ),
+                                onPressed: signIn,
                               ),
-                              FlatButton(
-                                onPressed: () => Navigator.push(
+                            ),
+                            Container(
+                              width: double.infinity,
+                              margin: EdgeInsets.only(left: 15),
+                              child: GestureDetector(
+                                onTap: () => Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => ForgotPass(),
+                                      builder: (context) => SignUpPage(),
                                     )),
-                                padding: EdgeInsets.only(right: 0),
-                                child: Text(
-                                  'Forgot Password?',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w800),
+                                child: RichText(
+                                  text: TextSpan(
+                                    children: [
+                                      TextSpan(
+                                        text: 'Don\'t have an Account?   ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
+                                        ),
+                                      ),
+                                      TextSpan(
+                                        text: 'Sign Up ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            )
+                          ],
                         ),
-                      ),
-                      Container(
-                        height: 50,
-                        width: double.infinity,
-                        margin: EdgeInsets.all(20),
-                        child: RaisedButton(
-                          elevation: 10,
-                          padding: EdgeInsets.all(8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: Text(
-                            'Sign In',
-                            style: TextStyle(
-                                color: Color(0xFF527DAA),
-                                letterSpacing: 1.5,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                fontFamily: 'OpenSans'),
-                          ),
-                          onPressed: signIn,
-                        ),
-                      ),
-                      Container(
-                        width: double.infinity,
-                        margin: EdgeInsets.only(left: 35),
-                        child: GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => SignUpPage(),
-                              )),
-                          child: RichText(
-                            text: TextSpan(
-                              children: [
-                                TextSpan(
-                                  text: 'Don\'t have an Account?   ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                TextSpan(
-                                  text: 'Sign Up ',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   String validateEmail(String value) {
@@ -211,10 +223,14 @@ class _LoginPageState extends State<LoginPage> {
     final formState = _formKey.currentState;
     if (formState.validate()) {
       formState.save();
+      setState(() {
+        loading = true;
+      });
       try {
         FirebaseUser user = (await FirebaseAuth.instance
                 .signInWithEmailAndPassword(email: email, password: password))
             .user;
+
         if (user.isEmailVerified) {
           Navigator.push(
               context,
@@ -224,8 +240,10 @@ class _LoginPageState extends State<LoginPage> {
 
           return user.uid;
         } else {
-          // popup message
-          return null;
+          setState(() {
+            ErrorHint('Could not sign in with these credentials');
+            loading = false;
+          });
         }
       } catch (e) {
         print(e.message);
