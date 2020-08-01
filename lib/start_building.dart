@@ -53,10 +53,18 @@ class _StepperClassState extends State<StepperClass> {
               children: <Widget>[
                 Container(
                   //margin: EdgeInsets.only(left: 83, right: 0),
-                  child: Image.asset(
-                    'assets/images/logo1.jpeg',
-                    fit: BoxFit.contain,
-                    height: 50,
+                  child: FlatButton(
+                    color: Colors.blue[900],
+                    child: Image.asset(
+                      'assets/images/logo1.jpeg',
+                      height: 50,
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MyHomePage()),
+                      );
+                    },
                   ),
                 ),
               ],
@@ -220,110 +228,6 @@ class _StepperClassState extends State<StepperClass> {
             "Congratulations! You've \nsuccessfully built a RWH system.",
             style: TextStyle(color: Colors.white),
           ),
-        ],
-      ),
-    );
-
-    flutterToast.showToast(
-      child: toast,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: Duration(seconds: 5),
-    );
-  }
-}
-
-        },
-      ),
-    );
-  }
-
-  List<Step> _mySteps() {
-    List<Step> _steps = [
-      Step(
-        title: Text(
-          'Step 1: Build a tank:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-        content: Column(
-          children: <Widget>[
-            Text(
-                'Depending on the number of users and volume of water to be collected, decide the type of your tank (RCC, Cement, Plastic).\n'),
-            //Image.asset('assets/images/image.png',fit: BoxFit.cover,),
-          ],
-        ),
-        isActive: _currentStep >= 0,
-      ),
-      Step(
-        title: Text(
-          'Step 2: Connecting pipes:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-        content: Column(
-          children: <Widget>[
-            Text(
-                'Depending on the size of the building decide the number of outlets from the roof to the ground level.\n'),
-            //Image.asset('assets/images/image.png', fit: BoxFit.cover,),
-          ],
-        ),
-        isActive: _currentStep >= 1,
-      ),
-      Step(
-        title: Text(
-          'Step 3: Filtration:',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-        content: Column(
-          children: <Widget>[
-            Text('Connect the RWH filter at the end of the pipe.\n'),
-            //Image.asset('assets/images/image.png', fit: BoxFit.cover,),
-          ],
-        ),
-        isActive: _currentStep >= 2,
-      ),
-      Step(
-        title: Text(
-          'Step 4: Storage: ',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-        ),
-        content: Column(
-          children: <Widget>[
-            Text(
-                'Connect the other end of the filter to a pipe leading to the storage element/tank.\n'),
-            //Image.asset('assets/images/image.png',fit: BoxFit.cover,),
-          ],
-        ),
-        isActive: _currentStep >= 3,
-      ),
-    ];
-    return _steps;
-  }
-
-  FlutterToast flutterToast;
-
-  @override
-  void initState() {
-    super.initState();
-    flutterToast = FlutterToast(context);
-  }
-
-  _showToast() {
-    Widget toast = Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 12.0),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(25.0),
-        color: Colors.black87,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-       
-          Text(
-            "Congratulations!\nYou've successfully built a RWH system.",
-            style: TextStyle(color: Colors.white),
-          ),
-               ),
         ],
       ),
     );
